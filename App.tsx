@@ -1,13 +1,24 @@
 import React, { Component }  from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 
 class Square extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: null,
+    };
+  }
+
   render() {
     return (
-      <Button
-      title={`${this.props.value}`} // titleはstringじゃないとエラー
-      style={styles.square}
-      />
+      <View style={styles.square}>
+        <Button
+        onPress={() => {Alert.alert('click')}}
+        title={`${this.props.value}`}
+        color="#000"
+        style={styles.button}
+        />
+      </View>
     );
   }
 }
@@ -20,19 +31,19 @@ class Board extends React.Component {
     status = 'Next player: X';
 
     return (
-      <View>
-        <Text>{status}</Text>
-        <View>
+      <View style={styles.container}>
+        <Text style={styles.text}>{status}</Text>
+        <View style={styles.row}>
           {this.renderSquare(0)}
           {this.renderSquare(1)}
           {this.renderSquare(2)}
         </View>
-        <View>
+        <View style={styles.row}>
           {this.renderSquare(3)}
           {this.renderSquare(4)}
           {this.renderSquare(5)}
         </View>
-        <View>
+        <View style={styles.row}>
           {this.renderSquare(6)}
           {this.renderSquare(7)}
           {this.renderSquare(8)}
@@ -45,7 +56,7 @@ class Board extends React.Component {
 export default class Game extends Component {
   render() {
     return (
-      <View style={{ alignItems: 'center', top: 50 }}>
+      <View style={{ alignItems: 'center', top: 100 }}>
         <View>
           <Board />
         </View>
@@ -56,15 +67,23 @@ export default class Game extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 300,
+    height: 300,
+  },
+  text: {
+    marginBottom: 15,
+  },
+  row: {
+    flexDirection: 'row',
   },
   square: {
     borderColor: '#333',
+    width: 100,
+    height: 100,
     borderWidth: 1,
-    width: '30%',
-    backgroundColor: '#222'
+  },
+  button: {
+    width: 100,
+    height: 100,
   }
 });
