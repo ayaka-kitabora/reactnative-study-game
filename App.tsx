@@ -1,7 +1,10 @@
 import React, { Component }  from 'react';
-import { StyleSheet, Text, View, Button, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
-function Square(props) {
+interface SquareProps {
+  // onPress()どうしたらいいのか
+}
+function Square(props: SquareProps) {
   return (
     <TouchableOpacity
       onPress={() => props.onPress()}
@@ -13,7 +16,12 @@ function Square(props) {
   );
 }
 
-class Board extends React.Component {
+interface Props {}
+interface State {
+  squares: string[]
+  xIsNext: boolean
+}
+class Board extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,8 +29,8 @@ class Board extends React.Component {
       xIsNext: true,
     };
   }
-  handleClick(i) {
-    const squares = this.state.squares.slice();
+  handleClick(i: number) {
+    const squares: string[] = this.state.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
@@ -32,7 +40,7 @@ class Board extends React.Component {
       xIsNext: !this.state.xIsNext,
     });
   }
-  renderSquare(i) {
+  renderSquare(i: number) {
     return (
       <Square
         value={this.state.squares[i]}
@@ -42,7 +50,7 @@ class Board extends React.Component {
   }
   render() {
     const winner = calculateWinner(this.state.squares);
-    let status;
+    let status: string;
     if (winner) {
       status = 'Winner: ' + winner;
     } else {
@@ -72,7 +80,7 @@ class Board extends React.Component {
   }
 }
 // ヘルパー関数(あとでロジック差し替えたい)
-function calculateWinner(squares) {
+function calculateWinner(squares: string[]) {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
