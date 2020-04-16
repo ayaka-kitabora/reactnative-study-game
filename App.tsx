@@ -9,10 +9,10 @@ const Square: FC<SquareProps> = (props) => {
   return (
     <TouchableOpacity
       onPress={() => props.onPress()}
-    >
-    <View style={styles.square}>
-      <Text style={styles.squareText}>{props.value}</Text>
-    </View>
+      >
+      <View style={styles.square}>
+        <Text style={styles.squareText}>{props.value}</Text>
+      </View>
     </TouchableOpacity>
   );
 };
