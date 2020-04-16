@@ -105,6 +105,7 @@ const App: FC = () => {
     </View>
   );
 };
+export default App;
 
 const styles = StyleSheet.create({
   container: {
