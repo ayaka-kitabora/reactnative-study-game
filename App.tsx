@@ -105,7 +105,7 @@ const App: FC = () => {
     </View>
   );
 };
-export default App;
+
 
 const styles = StyleSheet.create({
   container: {
@@ -134,3 +134,5 @@ const styles = StyleSheet.create({
     height: 100,
   }
 });
+
+export default App;
