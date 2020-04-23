@@ -23,23 +23,30 @@ interface State {
   xIsNext: boolean
 }
 const Board: FC = () => {
-  const [squares, setSquares] = useState(Array(9).fill(null));
+  const squares = Array(9).fill(null);
+  const [history, setHistory] = useState([{squares: squares}]);
   const [xIsNext, setxIsNext] = useState(true);
+  const [current, setCurrent] = useState(squares);
 
   const handleClick = (i: number) => {
-    const tmpSquares: string[] = squares.slice();
+    const tmpSquares: string[] = current.slice();
     if (calculateWinner(tmpSquares) || tmpSquares[i]) {
       return;
     }
     tmpSquares[i] = xIsNext ? 'X' : 'O';
-    setSquares(tmpSquares);
+    setHistory(
+      history.concat([{
+        squares: tmpSquares
+      }])
+    );
+    setCurrent(tmpSquares);
     setxIsNext(!xIsNext);
   }
 
   const renderSquare = (i: number) => {
     return (
       <Square
-        value={squares[i]}
+        value={current[i]}
         onPress={() => handleClick(i)}
       />
     );
