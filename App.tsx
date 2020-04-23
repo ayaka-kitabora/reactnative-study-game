@@ -27,13 +27,13 @@ const Board: FC = () => {
   const [xIsNext, setxIsNext] = useState(true);
 
   const handleClick = (i: number) => {
-    const squares: string[] = this.state.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+    const tmpSquares: string[] = squares.slice();
+    if (calculateWinner(tmpSquares) || tmpSquares[i]) {
       return;
     }
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
-    setSquares(squares);
-    setxIsNext(!this.state.xIsNext);
+    tmpSquares[i] = xIsNext ? 'X' : 'O';
+    setSquares(tmpSquares);
+    setxIsNext(!xIsNext);
   }
 
   const renderSquare = (i: number) => {
