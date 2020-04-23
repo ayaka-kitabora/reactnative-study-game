@@ -1,85 +1,80 @@
-import React, { Component }  from 'react';
+import React, { FC, useState }  from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
 interface SquareProps {
   onPress: () => void
   value: string
 }
-function Square(props: SquareProps) {
+const Square: FC<SquareProps> = (props) => {
   return (
     <TouchableOpacity
       onPress={() => props.onPress()}
-    >
-    <View style={styles.square}>
-      <Text style={styles.squareText}>{props.value}</Text>
-    </View>
+      >
+      <View style={styles.square}>
+        <Text style={styles.squareText}>{props.value}</Text>
+      </View>
     </TouchableOpacity>
   );
-}
+};
 
 interface Props {}
 interface State {
   squares: string[]
   xIsNext: boolean
 }
-class Board extends React.Component<Props, State> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      squares: Array(9).fill(null),
-      xIsNext: true,
-    };
-  }
-  handleClick(i: number) {
-    const squares: string[] = this.state.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+const Board: FC = () => {
+  const [squares, setSquares] = useState(Array(9).fill(null));
+  const [xIsNext, setxIsNext] = useState(true);
+
+  const handleClick = (i: number) => {
+    const tmpSquares: string[] = squares.slice();
+    if (calculateWinner(tmpSquares) || tmpSquares[i]) {
       return;
     }
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
-    this.setState({
-      squares: squares,
-      xIsNext: !this.state.xIsNext,
-    });
+    tmpSquares[i] = xIsNext ? 'X' : 'O';
+    setSquares(tmpSquares);
+    setxIsNext(!xIsNext);
   }
-  renderSquare(i: number) {
+
+  const renderSquare = (i: number) => {
     return (
       <Square
-        value={this.state.squares[i]}
-        onPress={() => this.handleClick(i)}
+        value={squares[i]}
+        onPress={() => handleClick(i)}
       />
     );
   }
-  render() {
-    const winner = calculateWinner(this.state.squares);
-    let status: string;
-    if (winner) {
-      status = 'Winner: ' + winner;
-    } else {
-      status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-    }
 
-    return (
-      <View style={styles.container}>
-        <Text style={styles.text}>{status}</Text>
-        <View style={styles.row}>
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </View>
-        <View style={styles.row}>
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </View>
-        <View style={styles.row}>
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-         </View>
-     </View>
-    );
+  const winner = calculateWinner(squares);
+  let status: string;
+  if (winner) {
+    status = 'Winner: ' + winner;
+  } else {
+    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
   }
-}
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>{status}</Text>
+      <View style={styles.row}>
+        {renderSquare(0)}
+        {renderSquare(1)}
+        {renderSquare(2)}
+      </View>
+      <View style={styles.row}>
+        {renderSquare(3)}
+        {renderSquare(4)}
+        {renderSquare(5)}
+      </View>
+      <View style={styles.row}>
+        {renderSquare(6)}
+        {renderSquare(7)}
+        {renderSquare(8)}
+       </View>
+   </View>
+  );
+};
+
 // ヘルパー関数(あとでロジック差し替えたい)
 function calculateWinner(squares: string[]) {
   const lines = [
@@ -101,17 +96,16 @@ function calculateWinner(squares: string[]) {
   return null;
 }
 
-export default class Game extends Component {
-  render() {
-    return (
-      <View style={{ alignItems: 'center', top: 100 }}>
-        <View>
-          <Board />
-        </View>
+const App: FC = () => {
+  return (
+    <View style={{ alignItems: 'center', top: 100 }}>
+      <View>
+        <Board />
       </View>
-    );
-  }
-}
+    </View>
+  );
+};
+
 
 const styles = StyleSheet.create({
   container: {
@@ -140,3 +134,5 @@ const styles = StyleSheet.create({
     height: 100,
   }
 });
+
+export default App;
