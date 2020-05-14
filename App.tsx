@@ -1,5 +1,5 @@
 import React, { FC, useState }  from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ShadowPropTypesIOS } from 'react-native';
 
 interface SquareProps {
   onPress: () => void
@@ -17,15 +17,46 @@ const Square: FC<SquareProps> = (props) => {
   );
 };
 
-interface Props {}
-interface State {
+interface BoardProps {
+  onPress: (number) => void
   squares: string[]
-  xIsNext: boolean
-}
+};
+const Board: FC<BoardProps> = (props) => {
+
+  const renderSquare = (i: number) => {
+    return (
+      <Square
+        value={props.squares[i]}
+        onPress={() => props.onPress(i)}
+      />
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.row}>
+        {renderSquare(0)}
+        {renderSquare(1)}
+        {renderSquare(2)}
+      </View>
+      <View style={styles.row}>
+        {renderSquare(3)}
+        {renderSquare(4)}
+        {renderSquare(5)}
+      </View>
+      <View style={styles.row}>
+        {renderSquare(6)}
+        {renderSquare(7)}
+        {renderSquare(8)}
+       </View>
+   </View>
+  );
+};
+
 type squares = {
   squares: string[]
 };
-const Board: FC = () => {
+const App: FC = () => {
   const squares = Array(9).fill(null);
   const [history, setHistory] = useState([{squares: squares}]);
   const [xIsNext, setxIsNext] = useState(true);
@@ -46,18 +77,8 @@ const Board: FC = () => {
         squares: tmpSquares
       }])
     );
-    setCurrent(tmpSquares);
     setxIsNext(!xIsNext);
     setStepNumber(tmpHistory.length);
-  }
-
-  const renderSquare = (i: number) => {
-    return (
-      <Square
-        value={current[i]}
-        onPress={() => handleClick(i)}
-      />
-    );
   }
   const jumpTo = (step: number) => {
     setStepNumber(step);
@@ -67,9 +88,10 @@ const Board: FC = () => {
   const moves = history.map((step, move) => {
     const desc = move ? 'Go to move #' + move : 'Go to game start';
     return (
-      <View>
-        <text>{move}</text>
+      <View style={styles.move}>
+        <Text style={styles.moveNumber}>{move}</Text>
         <TouchableOpacity
+          style={styles.moveButton}
           onPress={() => jumpTo(move)}
           >
             <Text>{desc}</Text>
@@ -86,24 +108,18 @@ const Board: FC = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{status}</Text>
-      <View style={styles.row}>
-        {renderSquare(0)}
-        {renderSquare(1)}
-        {renderSquare(2)}
+    <View style={{ alignItems: 'center', top: 100 }}>
+      <View>
+        <Board 
+            squares={current}
+            onPress={(i) => handleClick(i)}
+            />
+        <View>
+          <Text style={styles.text}>{status}</Text>
+          <View>{moves}</View>
+        </View>
       </View>
-      <View style={styles.row}>
-        {renderSquare(3)}
-        {renderSquare(4)}
-        {renderSquare(5)}
-      </View>
-      <View style={styles.row}>
-        {renderSquare(6)}
-        {renderSquare(7)}
-        {renderSquare(8)}
-       </View>
-   </View>
+    </View>
   );
 };
 
@@ -128,15 +144,6 @@ function calculateWinner(squares: string[]) {
   return null;
 }
 
-const App: FC = () => {
-  return (
-    <View style={{ alignItems: 'center', top: 100 }}>
-      <View>
-        <Board />
-      </View>
-    </View>
-  );
-};
 
 
 const styles = StyleSheet.create({
@@ -164,6 +171,22 @@ const styles = StyleSheet.create({
   button: {
     width: 100,
     height: 100,
+  },
+  move: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  moveNumber: {
+    marginRight: 10,
+    width: 15,
+    padding: 3,
+  },
+  moveButton: {
+    borderColor: '#333',
+    borderWidth: 1,
+    width: 130,
+    padding: 3,
+    borderRadius: 3,
   }
 });
 
