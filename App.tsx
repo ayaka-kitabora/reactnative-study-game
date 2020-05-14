@@ -22,14 +22,21 @@ interface State {
   squares: string[]
   xIsNext: boolean
 }
+type squares = {
+  squares: string[]
+};
 const Board: FC = () => {
   const squares = Array(9).fill(null);
   const [history, setHistory] = useState([{squares: squares}]);
   const [xIsNext, setxIsNext] = useState(true);
   const [current, setCurrent] = useState(squares);
+  const winner = calculateWinner(squares);
+  const [stepNumber, setStepNumber] = useState(0);
 
   const handleClick = (i: number) => {
-    const tmpSquares: string[] = current.slice();
+    const tmpHistory = history.slice(0, stepNumber + 1);
+    const tmpCurrent: squares = tmpHistory[tmpHistory.length - 1];
+    const tmpSquares: string[] = tmpCurrent.squares;
     if (calculateWinner(tmpSquares) || tmpSquares[i]) {
       return;
     }
@@ -41,6 +48,7 @@ const Board: FC = () => {
     );
     setCurrent(tmpSquares);
     setxIsNext(!xIsNext);
+    setStepNumber(tmpHistory.length);
   }
 
   const renderSquare = (i: number) => {
@@ -51,8 +59,25 @@ const Board: FC = () => {
       />
     );
   }
+  const jumpTo = (step: number) => {
+    setStepNumber(step);
+    setxIsNext((step % 2) === 0);
+  }
 
-  const winner = calculateWinner(squares);
+  const moves = history.map((step, move) => {
+    const desc = move ? 'Go to move #' + move : 'Go to game start';
+    return (
+      <View>
+        <text>{move}</text>
+        <TouchableOpacity
+          onPress={() => jumpTo(move)}
+          >
+            <Text>{desc}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  });
+
   let status: string;
   if (winner) {
     status = 'Winner: ' + winner;
