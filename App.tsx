@@ -60,14 +60,12 @@ const App: FC = () => {
   const squares = Array(9).fill(null);
   const [history, setHistory] = useState([{squares: squares}]);
   const [xIsNext, setxIsNext] = useState(true);
-  const [current, setCurrent] = useState(squares);
   const winner = calculateWinner(squares);
   const [stepNumber, setStepNumber] = useState(0);
 
   const handleClick = (i: number) => {
-    const tmpHistory = history.slice(0, stepNumber + 1);
-    const tmpCurrent: squares = tmpHistory[tmpHistory.length - 1];
-    const tmpSquares: string[] = tmpCurrent.squares;
+    const tmpCurrent: squares = history[history.length - 1]
+    const tmpSquares: string[] = [...tmpCurrent.squares];
     if (calculateWinner(tmpSquares) || tmpSquares[i]) {
       return;
     }
@@ -78,17 +76,21 @@ const App: FC = () => {
       }])
     );
     setxIsNext(!xIsNext);
-    setStepNumber(tmpHistory.length);
+    setStepNumber(history.length);
   }
   const jumpTo = (step: number) => {
     setStepNumber(step);
     setxIsNext((step % 2) === 0);
+    const tmpHistory = history.slice(0, step + 1);
+    setHistory(
+      tmpHistory
+    );
   }
 
   const moves = history.map((step, move) => {
     const desc = move ? 'Go to move #' + move : 'Go to game start';
     return (
-      <View style={styles.move}>
+      <View style={styles.move} key={move}>
         <Text style={styles.moveNumber}>{move}</Text>
         <TouchableOpacity
           style={styles.moveButton}
@@ -111,7 +113,7 @@ const App: FC = () => {
     <View style={{ alignItems: 'center', top: 100 }}>
       <View>
         <Board 
-            squares={current}
+            squares={history[history.length - 1].squares}
             onPress={(i) => handleClick(i)}
             />
         <View>
