@@ -1,5 +1,5 @@
 import React, { FC, useState }  from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ShadowPropTypesIOS } from 'react-native';
 
 interface SquareProps {
   onPress: () => void
@@ -17,45 +17,23 @@ const Square: FC<SquareProps> = (props) => {
   );
 };
 
-interface Props {}
-interface State {
+interface BoardProps {
+  onPress: (number) => void
   squares: string[]
-  xIsNext: boolean
-}
-const Board: FC = () => {
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [xIsNext, setxIsNext] = useState(true);
-
-  const handleClick = (i: number) => {
-    const tmpSquares: string[] = squares.slice();
-    if (calculateWinner(tmpSquares) || tmpSquares[i]) {
-      return;
-    }
-    tmpSquares[i] = xIsNext ? 'X' : 'O';
-    setSquares(tmpSquares);
-    setxIsNext(!xIsNext);
-  }
+};
+const Board: FC<BoardProps> = (props) => {
 
   const renderSquare = (i: number) => {
     return (
       <Square
-        value={squares[i]}
-        onPress={() => handleClick(i)}
+        value={props.squares[i]}
+        onPress={() => props.onPress(i)}
       />
     );
   }
 
-  const winner = calculateWinner(squares);
-  let status: string;
-  if (winner) {
-    status = 'Winner: ' + winner;
-  } else {
-    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
-  }
-
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{status}</Text>
       <View style={styles.row}>
         {renderSquare(0)}
         {renderSquare(1)}
@@ -72,6 +50,78 @@ const Board: FC = () => {
         {renderSquare(8)}
        </View>
    </View>
+  );
+};
+
+type squares = {
+  squares: string[]
+};
+const App: FC = () => {
+  const squares = Array(9).fill(null);
+  const [history, setHistory] = useState([{squares: squares}]);
+  const [xIsNext, setxIsNext] = useState(true);
+  const winner = calculateWinner(squares);
+  const [stepNumber, setStepNumber] = useState(0);
+
+  const handleClick = (i: number) => {
+    const tmpCurrent: squares = history[history.length - 1]
+    const tmpSquares: string[] = [...tmpCurrent.squares];
+    if (calculateWinner(tmpSquares) || tmpSquares[i]) {
+      return;
+    }
+    tmpSquares[i] = xIsNext ? 'X' : 'O';
+    setHistory(
+      history.concat([{
+        squares: tmpSquares
+      }])
+    );
+    setxIsNext(!xIsNext);
+    setStepNumber(history.length);
+  }
+  const jumpTo = (step: number) => {
+    setStepNumber(step);
+    setxIsNext((step % 2) === 0);
+    const tmpHistory = history.slice(0, step + 1);
+    setHistory(
+      tmpHistory
+    );
+  }
+
+  const moves = history.map((step, move) => {
+    const desc = move ? 'Go to move #' + move : 'Go to game start';
+    return (
+      <View style={styles.move} key={move}>
+        <Text style={styles.moveNumber}>{move}</Text>
+        <TouchableOpacity
+          style={styles.moveButton}
+          onPress={() => jumpTo(move)}
+          >
+            <Text>{desc}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  });
+
+  let status: string;
+  if (winner) {
+    status = 'Winner: ' + winner;
+  } else {
+    status = 'Next player: ' + (xIsNext ? 'X' : 'O');
+  }
+
+  return (
+    <View style={{ alignItems: 'center', top: 100 }}>
+      <View>
+        <Board 
+            squares={history[history.length - 1].squares}
+            onPress={(i) => handleClick(i)}
+            />
+        <View>
+          <Text style={styles.text}>{status}</Text>
+          <View>{moves}</View>
+        </View>
+      </View>
+    </View>
   );
 };
 
@@ -96,15 +146,6 @@ function calculateWinner(squares: string[]) {
   return null;
 }
 
-const App: FC = () => {
-  return (
-    <View style={{ alignItems: 'center', top: 100 }}>
-      <View>
-        <Board />
-      </View>
-    </View>
-  );
-};
 
 
 const styles = StyleSheet.create({
@@ -132,6 +173,22 @@ const styles = StyleSheet.create({
   button: {
     width: 100,
     height: 100,
+  },
+  move: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  moveNumber: {
+    marginRight: 10,
+    width: 15,
+    padding: 3,
+  },
+  moveButton: {
+    borderColor: '#333',
+    borderWidth: 1,
+    width: 130,
+    padding: 3,
+    borderRadius: 3,
   }
 });
 
